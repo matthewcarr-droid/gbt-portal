@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GBT Staff Portal — Great British Terroir Ltd</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ── Reset & base ─────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --forest:    #1A3C2E;
+    --forest-d:  #0D2219;
+    --forest-m:  #2D6A4F;
+    --forest-l:  #3D8A67;
+    --parchment: #F5F0E8;
+    --parchment-d: #EDE6D6;
+    --gold:      #C9A84C;
+    --gold-l:    #E8C96A;
+    --ink:       #0D1F17;
+    --ink-m:     #2C4A38;
+    --muted:     #7A9585;
+    --white:     #FFFFFF;
+    --red:       #8B2020;
+    --red-bg:    #FDF0F0;
+    --amber:     #7A5020;
+    --amber-bg:  #FDF6E8;
+    --green-bg:  #EAF4EE;
+    --border:    #D4C9B5;
+    --border-d:  #B8AA95;
+    --sidebar-w: 260px;
+    --radius:    6px;
+    --shadow:    0 2px 12px rgba(13,34,25,0.10);
+    --shadow-lg: 0 8px 32px rgba(13,34,25,0.18);
+    --transition: 0.2s ease;
+  }
+  html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--parchment); color: var(--ink); }
+
+  /* ── LOGIN SCREEN ─────────────────────────────────────────── */
+  #login-screen {
+    position: fixed; inset: 0; z-index: 1000;
+    background: var(--forest-d);
+    display: flex; align-items: center; justify-content: center;
+    animation: fadeIn 0.4s ease;
+  }
+  #login-screen.hidden { display: none; }
+  .login-card {
+    background: var(--parchment);
+    border-radius: 12px;
+    padding: 48px 44px 44px;
+    width: 100%; max-width: 420px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+  }
+  .login-logo {
+    width: 72px; height: 72px; margin: 0 auto 20px;
+    background: var(--forest);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px; font-weight: 700; color: var(--gold);
+    letter-spacing: 0.5px;
+  }
+  .login-card h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px; font-weight: 600; color: var(--forest);
+    margin-bottom: 4px;
+  }
+  .login-card .login-sub {
+    font-size: 12px; color: var(--muted); letter-spacing: 0.08em;
+    text-transform: uppercase; margin-bottom: 32px;
+  }
+  .form-group { text-align: left; margin-bottom: 18px; }
+  .form-group label {
+    display: block; font-size: 11px; font-weight: 600;
+    color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .form-group input {
+    width: 100%; padding: 11px 14px;
+    border: 1.5px solid var(--border-d);
+    border-radius: var(--radius);
+    font-family: 'Inter', sans-serif; font-size: 14px; color: var(--ink);
+    background: var(--white);
+    transition: border-color var(--transition);
+    outline: none;
+  }
+  .form-group input:focus { border-color: var(--forest-m); }
+  .btn-login {
+    width: 100%; padding: 13px;
+    background: var(--forest);
+    color: var(--white);
+    border: none; border-radius: var(--radius);
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+    cursor: pointer; letter-spacing: 0.03em;
+    transition: background var(--transition), transform 0.1s;
+    margin-top: 6px;
+  }
+  .btn-login:hover { background: var(--forest-m); }
+  .btn-login:active { transform: scale(0.99); }
+  #login-error {
+    font-size: 13px; color: var(--red);
+    background: var(--red-bg); border-radius: var(--radius);
+    padding: 10px 14px; margin-top: 14px; display: none;
+  }
+  .login-footer { font-size: 11px; color: var(--muted); margin-top: 28px; }
+  .login-footer strong { color: var(--forest); }
+
+  /* ── SETUP NOTICE ─────────────────────────────────────────── */
+  #setup-notice {
+    position: fixed; inset: 0; z-index: 2000;
+    background: rgba(13,34,25,0.92);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  #setup-notice.hidden { display: none; }
+  .setup-card {
+    background: var(--parchment); border-radius: 12px;
+    padding: 40px; max-width: 640px; width: 100%;
+    box-shadow: var(--shadow-lg);
+  }
+  .setup-card h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px; color: var(--forest); margin-bottom: 16px;
+  }
+  .setup-step {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px;
+  }
+  .setup-step .step-num {
+    font-size: 10px; font-weight: 700; color: var(--gold);
+    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px;
+  }
+  .setup-step p { font-size: 13px; color: var(--ink-m); line-height: 1.6; }
+  .setup-step a { color: var(--forest-m); }
+  .setup-step code {
+    background: var(--parchment-d); padding: 2px 6px;
+    border-radius: 3px; font-size: 12px; color: var(--forest);
+  }
+  .btn-dismiss {
+    margin-top: 20px; padding: 11px 24px;
+    background: var(--forest); color: var(--white);
+    border: none; border-radius: var(--radius);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+
+  /* ── APP SHELL ────────────────────────────────────────────── */
+  #app { display: none; height: 100vh; overflow: hidden; }
+  #app.visible { display: flex; }
+
+  /* ── SIDEBAR ──────────────────────────────────────────────── */
+  .sidebar {
+    width: var(--sidebar-w); flex-shrink: 0;
+    background: var(--forest-d);
+    display: flex; flex-direction: column;
+    height: 100vh; overflow: hidden;
+    position: relative;
+  }
+  /* Vine motif — SVG background */
+  .sidebar::before {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 300px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='300' viewBox='0 0 260 300'%3E%3Cpath d='M30 300 Q50 250 40 200 Q30 150 60 120 Q90 90 80 50' stroke='%231A3C2E' stroke-width='2' fill='none'/%3E%3Ccircle cx='55' cy='180' r='12' fill='%23162E22'/%3E%3Ccircle cx='48' cy='155' r='8' fill='%23162E22'/%3E%3Ccircle cx='70' cy='135' r='10' fill='%23162E22'/%3E%3Cpath d='M200 300 Q180 240 195 190 Q210 140 185 100' stroke='%231A3C2E' stroke-width='1.5' fill='none'/%3E%3Ccircle cx='192' cy='220' r='9' fill='%23162E22'/%3E%3Ccircle cx='200' cy='165' r='7' fill='%23162E22'/%3E%3C/svg%3E") no-repeat bottom center;
+    pointer-events: none; opacity: 0.6;
+  }
+  .sidebar-header {
+    padding: 28px 22px 22px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .sidebar-brand {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .brand-crest {
+    width: 40px; height: 40px; flex-shrink: 0;
+    background: var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px; font-weight: 700; color: var(--forest-d);
+  }
+  .brand-text { flex: 1; }
+  .brand-text .brand-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px; font-weight: 600; color: var(--white);
+    line-height: 1.2; letter-spacing: 0.01em;
+  }
+  .brand-text .brand-sub {
+    font-size: 10px; color: var(--muted); letter-spacing: 0.08em;
+    text-transform: uppercase; margin-top: 2px;
+  }
+  .sidebar-user {
+    padding: 14px 22px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .user-pill {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .user-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--forest-m);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: var(--white);
+  }
+  .user-info .user-name { font-size: 13px; font-weight: 500; color: var(--white); }
+  .user-info .user-role { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .sidebar-nav { flex: 1; padding: 16px 0; overflow-y: auto; position: relative; z-index: 1; }
+  .nav-section-label {
+    font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.25);
+    letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 14px 22px 6px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 22px; cursor: pointer;
+    transition: background var(--transition);
+    border-left: 3px solid transparent;
+    font-size: 13px; font-weight: 400; color: rgba(255,255,255,0.65);
+    user-select: none;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+  .nav-item.active {
+    background: rgba(201,168,76,0.12);
+    border-left-color: var(--gold);
+    color: var(--white);
+    font-weight: 500;
+  }
+  .nav-icon { width: 18px; text-align: center; font-size: 15px; flex-shrink: 0; }
+  .sidebar-footer {
+    padding: 16px 22px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    position: relative; z-index: 1;
+  }
+  .btn-logout {
+    width: 100%; padding: 9px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius);
+    color: rgba(255,255,255,0.5); font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: all var(--transition);
+  }
+  .btn-logout:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+
+  /* ── MAIN CONTENT ─────────────────────────────────────────── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0 32px; height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .topbar-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 600; color: var(--forest);
+  }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .topbar-date { font-size: 12px; color: var(--muted); }
+  .btn-primary {
+    padding: 9px 18px;
+    background: var(--forest); color: var(--white);
+    border: none; border-radius: var(--radius);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: background var(--transition);
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .btn-primary:hover { background: var(--forest-m); }
+  .btn-secondary {
+    padding: 8px 16px;
+    background: transparent; color: var(--forest-m);
+    border: 1.5px solid var(--forest-m); border-radius: var(--radius);
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: all var(--transition);
+  }
+  .btn-secondary:hover { background: var(--green-bg); }
+  .content-area {
+    flex: 1; overflow-y: auto; padding: 32px;
+    background: var(--parchment);
+  }
+
+  /* ── PAGES (hide/show) ────────────────────────────────────── */
+  .page { display: none; animation: fadeIn 0.25s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* ── DASHBOARD ────────────────────────────────────────────── */
+  .dashboard-welcome {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px; font-weight: 600; color: var(--forest);
+    margin-bottom: 4px;
+  }
+  .dashboard-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px; margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px 22px;
+    position: relative; overflow: hidden;
+    transition: box-shadow var(--transition), transform var(--transition);
+  }
+  .stat-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+  .stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--forest-m);
+  }
+  .stat-card.gold::before { background: var(--gold); }
+  .stat-card.red::before { background: var(--red); }
+  .stat-card.amber::before { background: #C9A84C; }
+  .stat-label { font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+  .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 700; color: var(--forest); line-height: 1; }
+  .stat-value.small { font-size: 24px; }
+  .stat-meta { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .dash-panel {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 10px; padding: 22px;
+  }
+  .dash-panel h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px; font-weight: 600; color: var(--forest);
+    margin-bottom: 16px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .recent-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 0; border-bottom: 1px solid var(--parchment-d);
+    font-size: 13px;
+  }
+  .recent-item:last-child { border-bottom: none; }
+  .recent-name { color: var(--ink); font-weight: 500; }
+  .recent-meta { color: var(--muted); font-size: 11px; margin-top: 2px; }
+  .empty-state {
+    text-align: center; padding: 30px 20px; color: var(--muted);
+    font-size: 13px; font-style: italic;
+  }
+
+  /* ── STATUS PILLS ─────────────────────────────────────────── */
+  .pill {
+    display: inline-flex; align-items: center;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .pill.approved { background: var(--green-bg); color: var(--forest-m); }
+  .pill.pending  { background: var(--amber-bg); color: var(--amber); }
+  .pill.declined { background: var(--red-bg); color: var(--red); }
+  .pill.dp       { background: var(--green-bg); color: var(--forest-m); }
+  .pill.in       { background: #E8F4FD; color: #1A5276; }
+  .pill.out      { background: var(--amber-bg); color: var(--amber); }
+
+  /* ── SECTION HEADER ───────────────────────────────────────── */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .section-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px; font-weight: 600; color: var(--forest);
+  }
+  .section-header p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  /* ── TABLE ────────────────────────────────────────────────── */
+  .table-wrap {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+  }
+  .table-toolbar {
+    padding: 14px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .search-input {
+    flex: 1; padding: 8px 12px;
+    border: 1.5px solid var(--border); border-radius: var(--radius);
+    font-size: 13px; font-family: 'Inter', sans-serif; color: var(--ink);
+    outline: none; background: var(--parchment);
+    transition: border-color var(--transition);
+  }
+  .search-input:focus { border-color: var(--forest-m); background: var(--white); }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 12px 16px; text-align: left;
+    font-size: 10px; font-weight: 700; color: var(--muted);
+    letter-spacing: 0.09em; text-transform: uppercase;
+    background: var(--parchment); border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--parchment-d);
+    transition: background var(--transition);
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--parchment); }
+  tbody td { padding: 13px 16px; font-size: 13px; color: var(--ink); vertical-align: middle; }
+  tbody td.muted { color: var(--muted); font-size: 12px; }
+  .table-empty { padding: 48px 20px; text-align: center; color: var(--muted); font-size: 14px; font-style: italic; }
+
+  /* ── MODAL ────────────────────────────────────────────────── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(13,34,25,0.65);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 40px 20px; overflow-y: auto;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-overlay.hidden { display: none; }
+  .modal {
+    background: var(--parchment); border-radius: 12px;
+    width: 100%; max-width: 620px;
+    box-shadow: var(--shadow-lg); padding: 32px 36px 36px;
+    position: relative;
+  }
+  .modal h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px; font-weight: 600; color: var(--forest);
+    margin-bottom: 22px; padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-close {
+    position: absolute; top: 20px; right: 20px;
+    background: none; border: none; cursor: pointer;
+    font-size: 20px; color: var(--muted);
+    width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; transition: background var(--transition);
+  }
+  .modal-close:hover { background: var(--border); }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .modal-grid.single { grid-template-columns: 1fr; }
+  .field-group { display: flex; flex-direction: column; gap: 5px; }
+  .field-group.span-2 { grid-column: 1 / -1; }
+  .field-group label {
+    font-size: 10px; font-weight: 700; color: var(--muted);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .field-group input,
+  .field-group select,
+  .field-group textarea {
+    padding: 9px 12px;
+    border: 1.5px solid var(--border-d); border-radius: var(--radius);
+    font-family: 'Inter', sans-serif; font-size: 13px; color: var(--ink);
+    background: var(--white); outline: none;
+    transition: border-color var(--transition);
+  }
+  .field-group input:focus,
+  .field-group select:focus,
+  .field-group textarea:focus { border-color: var(--forest-m); }
+  .field-group textarea { resize: vertical; min-height: 72px; }
+  .modal-actions {
+    display: flex; gap: 10px; justify-content: flex-end;
+    margin-top: 22px; padding-top: 18px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── DOCUMENTS ────────────────────────────────────────────── */
+  .doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+  .doc-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px;
+    display: flex; flex-direction: column; gap: 10px;
+    transition: box-shadow var(--transition), transform var(--transition);
+    cursor: pointer;
+  }
+  .doc-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+  .doc-icon {
+    width: 42px; height: 42px; border-radius: 8px;
+    background: var(--green-bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .doc-name { font-size: 14px; font-weight: 600; color: var(--ink); line-height: 1.3; }
+  .doc-type { font-size: 11px; color: var(--muted); }
+  .doc-note { font-size: 11px; color: var(--forest-m); font-style: italic; }
+
+  /* ── AWRS BADGE ───────────────────────────────────────────── */
+  .awrs-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--green-bg); color: var(--forest-m);
+    padding: 4px 10px; border-radius: 4px;
+    font-size: 11px; font-weight: 600; font-family: 'Inter', monospace;
+  }
+
+  /* ── STOCK RUNNING TOTAL ──────────────────────────────────── */
+  .running-total-banner {
+    background: var(--forest); color: var(--white);
+    border-radius: 10px; padding: 16px 22px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .rt-label { font-size: 11px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.08em; }
+  .rt-value { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; color: var(--gold); }
+
+  /* ── RESPONSIVE ───────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    :root { --sidebar-w: 220px; }
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .modal-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 680px) {
+    .sidebar { position: fixed; left: -260px; z-index: 200; transition: left 0.3s; }
+    .sidebar.open { left: 0; }
+    .content-area { padding: 20px 16px; }
+  }
+
+  /* ── MISC ─────────────────────────────────────────────────── */
+  .gold-line { height: 2px; background: linear-gradient(90deg, var(--gold), transparent); margin: 20px 0; border: none; }
+  .text-muted { color: var(--muted); font-size: 12px; }
+  .mt-4 { margin-top: 4px; }
+  .fw-500 { font-weight: 500; }
+  .notice {
+    background: var(--amber-bg); border: 1px solid #E8C97A;
+    border-radius: var(--radius); padding: 12px 16px;
+    font-size: 13px; color: var(--amber); margin-bottom: 16px;
+  }
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+    background: var(--forest-d); color: var(--white);
+    padding: 12px 20px; border-radius: 8px;
+    font-size: 13px; font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.3s ease;
+    display: none;
+  }
+  .toast.show { display: block; }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SETUP NOTICE (shown first time)
+════════════════════════════════════════════════════════════ -->
+<div id="setup-notice">
+  <div class="setup-card">
+    <h2>⚙️ Firebase Setup Required</h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6;">
+      This portal uses Google Firebase for secure login and data storage — it's free and takes about 10 minutes to set up. Complete these steps once, then the portal is ready for you and your staff.
+    </p>
+    <div class="setup-step">
+      <div class="step-num">Step 1 — Create a Firebase project</div>
+      <p>Go to <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> and sign in with your Google account. Click <strong>Add project</strong> and name it <strong>gbt-portal</strong>. Disable Google Analytics when prompted.</p>
+    </div>
+    <div class="setup-step">
+      <div class="step-num">Step 2 — Enable Authentication</div>
+      <p>In your project, go to <strong>Build → Authentication → Get started</strong>. Under <strong>Sign-in method</strong>, enable <strong>Email/Password</strong>. Then go to <strong>Users</strong> and add yourself: <code>matthewcarr@greatbritishterroir.co.uk</code> and a strong password. Add Millie's email for her access.</p>
+    </div>
+    <div class="setup-step">
+      <div class="step-num">Step 3 — Create a Firestore database</div>
+      <p>Go to <strong>Build → Firestore Database → Create database</strong>. Choose <strong>Start in production mode</strong> and select <strong>europe-west2</strong> (London) as your region.</p>
+    </div>
+    <div class="setup-step">
+      <div class="step-num">Step 4 — Paste your Firebase config</div>
+      <p>Go to <strong>Project Settings → General → Your apps → Add app → Web</strong>. Register the app and copy the <code>firebaseConfig</code> object. Replace the placeholder config in the <code>&lt;script&gt;</code> section at the bottom of this HTML file with your values.</p>
+    </div>
+    <div class="setup-step">
+      <div class="step-num">Step 5 — Set Firestore security rules</div>
+      <p>In Firestore → Rules, replace the existing rule with: <code>allow read, write: if request.auth != null;</code> — this ensures only logged-in users can access data.</p>
+    </div>
+    <div class="setup-step">
+      <div class="step-num">Step 6 — Host on GitHub Pages or Netlify</div>
+      <p>Upload this single HTML file to <a href="https://pages.github.com" target="_blank">GitHub Pages</a> or <a href="https://netlify.com" target="_blank">Netlify</a> (both free). You can then point your <code>portal.greatbritishterroir.co.uk</code> subdomain to it via your domain settings in Squarespace.</p>
+    </div>
+    <button class="btn-dismiss" onclick="document.getElementById('setup-notice').classList.add('hidden')">Got it — open the portal demo</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     LOGIN SCREEN
+════════════════════════════════════════════════════════════ -->
+<div id="login-screen" class="hidden">
+  <div class="login-card">
+    <div class="login-logo">GBT</div>
+    <h1>Great British Terroir</h1>
+    <p class="login-sub">Staff Portal — Secure Login</p>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="login-email" placeholder="you@greatbritishterroir.co.uk" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn-login" onclick="handleLogin()">Sign In</button>
+    <div id="login-error"></div>
+    <p class="login-footer">Access restricted to authorised <strong>Great British Terroir Ltd</strong> staff only.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     APP SHELL
+════════════════════════════════════════════════════════════ -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="brand-crest">GBT</div>
+        <div class="brand-text">
+          <div class="brand-name">Great British<br>Terroir Ltd</div>
+          <div class="brand-sub">Staff Portal</div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-pill">
+        <div class="user-avatar" id="user-avatar">M</div>
+        <div class="user-info">
+          <div class="user-name" id="user-name-display">Loading...</div>
+          <div class="user-role">Authorised Staff</div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active" onclick="navigate('dashboard')">
+        <span class="nav-icon">⊞</span> Dashboard
+      </div>
+      <div class="nav-section-label">Compliance</div>
+      <div class="nav-item" onclick="navigate('customers')">
+        <span class="nav-icon">👥</span> Customer Register
+      </div>
+      <div class="nav-item" onclick="navigate('suppliers')">
+        <span class="nav-icon">🍇</span> Supplier Register
+      </div>
+      <div class="nav-section-label">Stock</div>
+      <div class="nav-item" onclick="navigate('stock')">
+        <span class="nav-icon">📋</span> Stock Movements
+      </div>
+      <div class="nav-item" onclick="navigate('inventory')">
+        <span class="nav-icon">📦</span> Warehouse Inventory
+      </div>
+      <div class="nav-item" onclick="navigate('wastage')">
+        <span class="nav-icon">⚠️</span> Wastage & Breakage
+      </div>
+      <div class="nav-section-label">Resources</div>
+      <div class="nav-item" onclick="navigate('documents')">
+        <span class="nav-icon">📄</span> Documents
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="page-title">Dashboard</div>
+      <div class="topbar-right">
+        <span class="topbar-date" id="topbar-date"></span>
+        <button class="btn-primary" id="topbar-action" style="display:none"></button>
+      </div>
+    </div>
+    <div class="content-area">
+
+      <!-- ══ DASHBOARD ══ -->
+      <div class="page active" id="page-dashboard">
+        <div class="dashboard-welcome" id="dash-greeting">Good morning</div>
+        <p class="dashboard-sub">Here's an overview of your compliance records and stock position.</p>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Active Customers</div>
+            <div class="stat-value" id="stat-customers">0</div>
+            <div class="stat-meta">Trade accounts</div>
+          </div>
+          <div class="stat-card gold">
+            <div class="stat-label">Approved Suppliers</div>
+            <div class="stat-value" id="stat-suppliers">0</div>
+            <div class="stat-meta">AWRS verified</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Stock Lines</div>
+            <div class="stat-value" id="stat-stock-lines">0</div>
+            <div class="stat-meta">Products in inventory</div>
+          </div>
+          <div class="stat-card amber">
+            <div class="stat-label">Stock Value</div>
+            <div class="stat-value small" id="stat-stock-value">£0</div>
+            <div class="stat-meta">At cost price</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-label">Wastage This Period</div>
+            <div class="stat-value small" id="stat-wastage">£0</div>
+            <div class="stat-meta">Cost value lost</div>
+          </div>
+        </div>
+        <div class="dashboard-grid">
+          <div class="dash-panel">
+            <h3>📋 Recent Stock Movements</h3>
+            <div id="dash-stock-recent"><div class="empty-state">No movements logged yet.</div></div>
+          </div>
+          <div class="dash-panel">
+            <h3>👥 Recent Customers</h3>
+            <div id="dash-customers-recent"><div class="empty-state">No customers logged yet.</div></div>
+          </div>
+          <div class="dash-panel">
+            <h3>🍇 Suppliers — AWRS Status</h3>
+            <div id="dash-suppliers-recent"><div class="empty-state">No suppliers logged yet.</div></div>
+          </div>
+          <div class="dash-panel">
+            <h3>⚠️ Recent Incidents</h3>
+            <div id="dash-wastage-recent"><div class="empty-state">No incidents logged yet.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ CUSTOMERS ══ -->
+      <div class="page" id="page-customers">
+        <div class="section-header">
+          <div>
+            <h2>Customer Register</h2>
+            <p>All on-trade customers — due diligence status and licence verification</p>
+          </div>
+          <button class="btn-primary" onclick="openModal('customer')">+ Add Customer</button>
+        </div>
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <input class="search-input" type="text" placeholder="Search customers..." oninput="filterTable('customers-table', this.value)">
+          </div>
+          <table id="customers-table">
+            <thead>
+              <tr>
+                <th>Business Name</th>
+                <th>Contact</th>
+                <th>Address</th>
+                <th>Premises Licence</th>
+                <th>Companies House</th>
+                <th>DD Status</th>
+                <th>Date Added</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="customers-tbody">
+              <tr><td colspan="8" class="table-empty">No customers logged yet. Click <strong>+ Add Customer</strong> to begin.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ SUPPLIERS ══ -->
+      <div class="page" id="page-suppliers">
+        <div class="section-header">
+          <div>
+            <h2>Supplier Register</h2>
+            <p>AWRS-verified wine producers and wholesalers</p>
+          </div>
+          <button class="btn-primary" onclick="openModal('supplier')">+ Add Supplier</button>
+        </div>
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <input class="search-input" type="text" placeholder="Search suppliers..." oninput="filterTable('suppliers-table', this.value)">
+          </div>
+          <table id="suppliers-table">
+            <thead>
+              <tr>
+                <th>Business Name</th>
+                <th>Contact</th>
+                <th>AWRS URN</th>
+                <th>AWRS Status</th>
+                <th>Duty Status</th>
+                <th>Last AWRS Check</th>
+                <th>DD Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="suppliers-tbody">
+              <tr><td colspan="8" class="table-empty">No suppliers logged yet. Click <strong>+ Add Supplier</strong> to begin.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ STOCK MOVEMENTS ══ -->
+      <div class="page" id="page-stock">
+        <div class="section-header">
+          <div>
+            <h2>Stock Movement Log</h2>
+            <p>All stock movements in and out — running total calculated automatically</p>
+          </div>
+          <button class="btn-primary" onclick="openModal('stock')">+ Log Movement</button>
+        </div>
+        <div class="running-total-banner">
+          <div>
+            <div class="rt-label">Current Running Total</div>
+            <div class="rt-value" id="running-total-display">0 bottles</div>
+          </div>
+          <div style="text-align:right">
+            <div class="rt-label">All stock is</div>
+            <div style="color:var(--gold-l);font-size:14px;font-weight:600;margin-top:4px">DUTY PAID ✓</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <input class="search-input" type="text" placeholder="Search stock movements..." oninput="filterTable('stock-table', this.value)">
+          </div>
+          <table id="stock-table">
+            <thead>
+              <tr>
+                <th>Ref</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Supplier / Customer</th>
+                <th>Product</th>
+                <th>Vintage</th>
+                <th>Qty</th>
+                <th>Running Total</th>
+                <th>Logged By</th>
+              </tr>
+            </thead>
+            <tbody id="stock-tbody">
+              <tr><td colspan="9" class="table-empty">No movements logged yet. Click <strong>+ Log Movement</strong> to begin.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ INVENTORY ══ -->
+      <div class="page" id="page-inventory">
+        <div class="section-header">
+          <div>
+            <h2>Warehouse Inventory</h2>
+            <p>Current stock at 21 Ramsey Avenue, Bacup, OL13 9PG</p>
+          </div>
+          <button class="btn-primary" onclick="openModal('inventory')">+ Add Stock Line</button>
+        </div>
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <input class="search-input" type="text" placeholder="Search inventory..." oninput="filterTable('inventory-table', this.value)">
+          </div>
+          <table id="inventory-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Producer</th>
+                <th>Vintage</th>
+                <th>Type</th>
+                <th>Bottles</th>
+                <th>Unit Cost</th>
+                <th>Total Value</th>
+                <th>Last Updated</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-tbody">
+              <tr><td colspan="9" class="table-empty">No stock lines logged yet. Click <strong>+ Add Stock Line</strong> to begin.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="text-align:right;margin-top:12px;font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--forest);font-weight:600">
+          Total Inventory Value: <span id="inventory-total" style="color:var(--gold)">£0.00</span>
+        </div>
+      </div>
+
+      <!-- ══ WASTAGE ══ -->
+      <div class="page" id="page-wastage">
+        <div class="section-header">
+          <div>
+            <h2>Wastage & Breakage Log</h2>
+            <p>All stock incidents — cost impact and action taken</p>
+          </div>
+          <button class="btn-primary" onclick="openModal('wastage')">+ Log Incident</button>
+        </div>
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <input class="search-input" type="text" placeholder="Search incidents..." oninput="filterTable('wastage-table', this.value)">
+          </div>
+          <table id="wastage-table">
+            <thead>
+              <tr>
+                <th>Ref</th>
+                <th>Date</th>
+                <th>Product</th>
+                <th>Producer</th>
+                <th>Qty</th>
+                <th>Code</th>
+                <th>Cost Value</th>
+                <th>Action Taken</th>
+                <th>Logged By</th>
+              </tr>
+            </thead>
+            <tbody id="wastage-tbody">
+              <tr><td colspan="9" class="table-empty">No incidents logged yet. Click <strong>+ Log Incident</strong> to begin.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="text-align:right;margin-top:12px;font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--forest);font-weight:600">
+          Total Wastage Cost: <span id="wastage-total" style="color:var(--red)">£0.00</span>
+        </div>
+      </div>
+
+      <!-- ══ DOCUMENTS ══ -->
+      <div class="page" id="page-documents">
+        <div class="section-header">
+          <div>
+            <h2>Document Library</h2>
+            <p>Template forms and compliance documents — updated versions always available here</p>
+          </div>
+        </div>
+        <div class="notice">
+          📁 Upload your documents to Google Drive and paste the shareable links into the cards below. Anyone with the portal login can then access them instantly.
+        </div>
+        <div class="doc-grid" id="doc-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </div><!-- /content-area -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODALS
+════════════════════════════════════════════════════════════ -->
+
+<!-- Customer Modal -->
+<div class="modal-overlay hidden" id="modal-customer">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('customer')">✕</button>
+    <h2>New Customer</h2>
+    <div class="modal-grid">
+      <div class="field-group"><label>Business / Trading Name *</label><input id="c-name" type="text" placeholder="e.g. GemNi Restaurant"></div>
+      <div class="field-group"><label>Company Number</label><input id="c-company-no" type="text" placeholder="or N/A + reason"></div>
+      <div class="field-group span-2"><label>Trading Address *</label><input id="c-address" type="text" placeholder="Full address"></div>
+      <div class="field-group"><label>Contact Name & Role</label><input id="c-contact" type="text" placeholder="e.g. Jane Smith, Manager"></div>
+      <div class="field-group"><label>Contact Email</label><input id="c-email" type="email" placeholder="contact@venue.co.uk"></div>
+      <div class="field-group"><label>Contact Telephone</label><input id="c-phone" type="tel" placeholder="07700..."></div>
+      <div class="field-group"><label>VAT Number</label><input id="c-vat" type="text" placeholder="GB..."></div>
+      <div class="field-group"><label>Premises Licence Number *</label><input id="c-licence" type="text" placeholder="Licence reference"></div>
+      <div class="field-group"><label>Licensing Authority</label><input id="c-authority" type="text" placeholder="e.g. Rossendale Borough Council"></div>
+      <div class="field-group"><label>Due Diligence Status *</label>
+        <select id="c-status">
+          <option value="approved">Approved</option>
+          <option value="pending">Pending</option>
+          <option value="declined">Declined</option>
+        </select>
+      </div>
+      <div class="field-group"><label>Companies House Verified?</label>
+        <select id="c-ch-verified">
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="N/A — Sole Trader">N/A — Sole Trader</option>
+          <option value="N/A — Partnership">N/A — Partnership</option>
+        </select>
+      </div>
+      <div class="field-group span-2"><label>Notes</label><textarea id="c-notes" placeholder="Any additional notes or risk factors observed..."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('customer')">Cancel</button>
+      <button class="btn-primary" onclick="saveCustomer()">Save Customer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Supplier Modal -->
+<div class="modal-overlay hidden" id="modal-supplier">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('supplier')">✕</button>
+    <h2>New Supplier</h2>
+    <div class="modal-grid">
+      <div class="field-group"><label>Business / Trading Name *</label><input id="s-name" type="text" placeholder="e.g. Albourne Winery Ltd"></div>
+      <div class="field-group"><label>Registered Company Name</label><input id="s-reg-name" type="text" placeholder="If different from trading name"></div>
+      <div class="field-group"><label>Company Number</label><input id="s-company-no" type="text" placeholder="or N/A + reason"></div>
+      <div class="field-group"><label>VAT Number</label><input id="s-vat" type="text" placeholder="GB..."></div>
+      <div class="field-group"><label>AWRS URN *</label><input id="s-awrs" type="text" placeholder="e.g. XJAW00000102670"></div>
+      <div class="field-group"><label>AWRS Status *</label>
+        <select id="s-awrs-status">
+          <option value="Approved">Approved</option>
+          <option value="Pending">Pending</option>
+          <option value="Revoked">Revoked</option>
+        </select>
+      </div>
+      <div class="field-group"><label>AWRS Last Checked *</label><input id="s-awrs-date" type="date"></div>
+      <div class="field-group"><label>Contact Name & Role</label><input id="s-contact" type="text" placeholder="e.g. Giles Cutlack, Trade Manager"></div>
+      <div class="field-group"><label>Contact Email</label><input id="s-email" type="email" placeholder="trade@vineyard.co.uk"></div>
+      <div class="field-group"><label>Contact Telephone</label><input id="s-phone" type="tel" placeholder="01234..."></div>
+      <div class="field-group span-2"><label>Trading Address</label><input id="s-address" type="text" placeholder="Vineyard / business address"></div>
+      <div class="field-group"><label>Vineyard Visited?</label>
+        <select id="s-visited"><option value="Yes">Yes</option><option value="No">No</option></select>
+      </div>
+      <div class="field-group"><label>Duty Paid Confirmed?</label>
+        <select id="s-duty"><option value="Yes">Yes</option><option value="No — do not use">No — do not use</option></select>
+      </div>
+      <div class="field-group"><label>Due Diligence Status *</label>
+        <select id="s-status">
+          <option value="approved">Approved</option>
+          <option value="pending">Pending</option>
+          <option value="declined">Declined</option>
+        </select>
+      </div>
+      <div class="field-group span-2"><label>Notes</label><textarea id="s-notes" placeholder="Contact notes, visit notes, any discrepancies..."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('supplier')">Cancel</button>
+      <button class="btn-primary" onclick="saveSupplier()">Save Supplier</button>
+    </div>
+  </div>
+</div>
+
+<!-- Stock Modal -->
+<div class="modal-overlay hidden" id="modal-stock">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('stock')">✕</button>
+    <h2>Log Stock Movement</h2>
+    <div class="modal-grid">
+      <div class="field-group"><label>Date *</label><input id="sm-date" type="date"></div>
+      <div class="field-group"><label>Movement Type *</label>
+        <select id="sm-type">
+          <option value="IN">IN — Stock received</option>
+          <option value="OUT">OUT — Stock dispatched</option>
+        </select>
+      </div>
+      <div class="field-group"><label>Supplier / Customer Name *</label><input id="sm-party" type="text" placeholder="Who did this movement involve?"></div>
+      <div class="field-group"><label>Product Description *</label><input id="sm-product" type="text" placeholder="e.g. Albourne Estate Blanc de Blancs"></div>
+      <div class="field-group"><label>Vintage</label><input id="sm-vintage" type="text" placeholder="e.g. 2022"></div>
+      <div class="field-group"><label>Quantity (bottles) *</label><input id="sm-qty" type="number" min="1" placeholder="0"></div>
+      <div class="field-group span-2"><label>Notes</label><textarea id="sm-notes" placeholder="Any additional details..."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('stock')">Cancel</button>
+      <button class="btn-primary" onclick="saveStock()">Log Movement</button>
+    </div>
+  </div>
+</div>
+
+<!-- Inventory Modal -->
+<div class="modal-overlay hidden" id="modal-inventory">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('inventory')">✕</button>
+    <h2>Add / Update Stock Line</h2>
+    <div class="modal-grid">
+      <div class="field-group"><label>Product Name *</label><input id="inv-product" type="text" placeholder="e.g. Blanc de Blancs 2022"></div>
+      <div class="field-group"><label>Producer *</label><input id="inv-producer" type="text" placeholder="e.g. Albourne Winery Ltd"></div>
+      <div class="field-group"><label>Vintage</label><input id="inv-vintage" type="text" placeholder="e.g. 2022"></div>
+      <div class="field-group"><label>Wine Type *</label>
+        <select id="inv-type">
+          <option value="SP">SP — Sparkling</option>
+          <option value="ST">ST — Still White</option>
+          <option value="RD">RD — Red</option>
+          <option value="RO">RO — Rosé</option>
+          <option value="OR">OR — Orange</option>
+          <option value="PT">PT — Pétillant Naturel</option>
+        </select>
+      </div>
+      <div class="field-group"><label>Number of Bottles *</label><input id="inv-bottles" type="number" min="0" placeholder="0"></div>
+      <div class="field-group"><label>Unit Cost (£) *</label><input id="inv-cost" type="number" step="0.01" min="0" placeholder="0.00"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('inventory')">Cancel</button>
+      <button class="btn-primary" onclick="saveInventory()">Save Stock Line</button>
+    </div>
+  </div>
+</div>
+
+<!-- Wastage Modal -->
+<div class="modal-overlay hidden" id="modal-wastage">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('wastage')">✕</button>
+    <h2>Log Wastage / Breakage</h2>
+    <div class="modal-grid">
+      <div class="field-group"><label>Date *</label><input id="w-date" type="date"></div>
+      <div class="field-group"><label>Incident Code *</label>
+        <select id="w-code">
+          <option value="BB">BB — Bottle Broken</option>
+          <option value="BC">BC — Bottle Corked</option>
+          <option value="BF">BF — Bottle Faulty</option>
+          <option value="BD">BD — Bottle Damaged</option>
+          <option value="SL">SL — Stock Loss</option>
+          <option value="OT">OT — Other</option>
+        </select>
+      </div>
+      <div class="field-group"><label>Product *</label><input id="w-product" type="text" placeholder="e.g. Blanc de Blancs 2022"></div>
+      <div class="field-group"><label>Producer *</label><input id="w-producer" type="text" placeholder="e.g. Albourne Winery Ltd"></div>
+      <div class="field-group"><label>Vintage</label><input id="w-vintage" type="text" placeholder="e.g. 2022"></div>
+      <div class="field-group"><label>Quantity (bottles) *</label><input id="w-qty" type="number" min="1" placeholder="0"></div>
+      <div class="field-group"><label>Cost Value (£) *</label><input id="w-cost" type="number" step="0.01" min="0" placeholder="0.00"></div>
+      <div class="field-group span-2"><label>Action Taken *</label><textarea id="w-action" placeholder="Describe what was done with the stock — disposed of, returned to supplier, investigation started..."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('wastage')">Cancel</button>
+      <button class="btn-primary" onclick="saveWastage()">Log Incident</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FIREBASE + APP LOGIC
+════════════════════════════════════════════════════════════ -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore, collection, addDoc, getDocs, doc, deleteDoc,
+    query, orderBy, onSnapshot, Timestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // ── PASTE YOUR FIREBASE CONFIG HERE ─────────────────────────────────────
+  const firebaseConfig = {
+  apiKey: "AIzaSyDuCPY1OF5gR9jF9T7x1gYG_xA-M4cH7PQ",
+  authDomain: "gbt-portal.firebaseapp.com",
+  projectId: "gbt-portal",
+  storageBucket: "gbt-portal.firebasestorage.app",
+  messagingSenderId: "23374777912",
+  appId: "1:23374777912:web:9dafaaebf5641b81e9a0cd"
+  };
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // ── Demo mode (when config not yet set) ────────────────────────────────
+  const isDemo = firebaseConfig.apiKey === "YOUR_API_KEY";
+
+  // Expose globals
+  window._auth = auth; window._db = db;
+  window._addDoc = addDoc; window._collection = collection;
+  window._getDocs = getDocs; window._doc = doc;
+  window._deleteDoc = deleteDoc; window._query = query;
+  window._orderBy = orderBy; window._onSnapshot = onSnapshot;
+  window._Timestamp = Timestamp;
+  window._isDemo = isDemo;
+  window._currentUserEmail = '';
+
+  // ── Auth state ──────────────────────────────────────────────────────────
+  onAuthStateChanged(auth, (user) => {
+    if (user || isDemo) {
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('app').classList.add('visible');
+      const email = user ? user.email : 'demo@greatbritishterroir.co.uk';
+      window._currentUserEmail = email;
+      const name = email.split('@')[0].replace('.', ' ');
+      const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+      document.getElementById('user-name-display').textContent = displayName;
+      document.getElementById('user-avatar').textContent = displayName.charAt(0).toUpperCase();
+      initApp();
+    } else {
+      document.getElementById('login-screen').classList.remove('hidden');
+      document.getElementById('app').classList.remove('visible');
+    }
+  });
+
+  // ── Login ───────────────────────────────────────────────────────────────
+  window.handleLogin = async () => {
+    if (isDemo) {
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('app').classList.add('visible');
+      return;
+    }
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const errEl = document.getElementById('login-error');
+    errEl.style.display = 'none';
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (e) {
+      errEl.style.display = 'block';
+      errEl.textContent = 'Incorrect email or password. Please try again.';
+    }
+  };
+  document.getElementById('login-password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.handleLogin();
+  });
+
+  // ── Logout ──────────────────────────────────────────────────────────────
+  window.handleLogout = () => { if (!isDemo) signOut(auth); else location.reload(); };
+
+  // ── App init ────────────────────────────────────────────────────────────
+  function initApp() {
+    setDate();
+    setGreeting();
+    buildDocuments();
+    if (!isDemo) {
+      listenCustomers();
+      listenSuppliers();
+      listenStock();
+      listenInventory();
+      listenWastage();
+    } else {
+      loadDemoData();
+    }
+  }
+
+  function setDate() {
+    const d = new Date();
+    document.getElementById('topbar-date').textContent =
+      d.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  }
+
+  function setGreeting() {
+    const h = new Date().getHours();
+    const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+    document.getElementById('dash-greeting').textContent = g;
+  }
+
+  // ── Firestore listeners ──────────────────────────────────────────────────
+
+  function listenCustomers() {
+    const q = query(collection(db, 'customers'), orderBy('createdAt', 'desc'));
+    onSnapshot(q, snap => {
+      const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderCustomers(docs);
+      document.getElementById('stat-customers').textContent = docs.filter(d => d.status === 'approved').length;
+      renderDashRecent('dash-customers-recent', docs.slice(0,4), d => `
+        <div class="recent-item">
+          <div><div class="recent-name">${d.name}</div><div class="recent-meta">${d.address || ''}</div></div>
+          <span class="pill ${d.status}">${d.status}</span>
+        </div>`);
+    });
+  }
+
+  function listenSuppliers() {
+    const q = query(collection(db, 'suppliers'), orderBy('createdAt', 'desc'));
+    onSnapshot(q, snap => {
+      const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderSuppliers(docs);
+      document.getElementById('stat-suppliers').textContent = docs.filter(d => d.status === 'approved').length;
+      renderDashRecent('dash-suppliers-recent', docs.slice(0,4), d => `
+        <div class="recent-item">
+          <div><div class="recent-name">${d.name}</div><div class="recent-meta awrs-badge" style="display:inline-flex;margin-top:4px">🔑 ${d.awrs || 'No URN'}</div></div>
+          <span class="pill ${d.awrsStatus === 'Approved' ? 'approved' : 'pending'}">${d.awrsStatus || '—'}</span>
+        </div>`);
+    });
+  }
+
+  function listenStock() {
+    const q = query(collection(db, 'stock'), orderBy('createdAt', 'desc'));
+    onSnapshot(q, snap => {
+      const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderStock(docs);
+      const total = docs.reduce((acc, d) => d.type === 'IN' ? acc + (d.qty||0) : acc - (d.qty||0), 0);
+      document.getElementById('stat-stock-lines').textContent = docs.length;
+      document.getElementById('running-total-display').textContent = `${total} bottles`;
+      renderDashRecent('dash-stock-recent', docs.slice(0,4), d => `
+        <div class="recent-item">
+          <div><div class="recent-name">${d.product}</div><div class="recent-meta">${d.party} · ${d.date}</div></div>
+          <span class="pill ${d.type === 'IN' ? 'in' : 'out'}">${d.type} ${d.qty}</span>
+        </div>`);
+    });
+  }
+
+  function listenInventory() {
+    const q = query(collection(db, 'inventory'), orderBy('createdAt', 'desc'));
+    onSnapshot(q, snap => {
+      const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderInventory(docs);
+      const total = docs.reduce((acc, d) => acc + ((d.bottles||0) * (d.cost||0)), 0);
+      document.getElementById('stat-stock-value').textContent = `£${total.toFixed(0)}`;
+      document.getElementById('inventory-total').textContent = `£${total.toFixed(2)}`;
+    });
+  }
+
+  function listenWastage() {
+    const q = query(collection(db, 'wastage'), orderBy('createdAt', 'desc'));
+    onSnapshot(q, snap => {
+      const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderWastage(docs);
+      const total = docs.reduce((acc, d) => acc + (d.cost||0), 0);
+      document.getElementById('stat-wastage').textContent = `£${total.toFixed(0)}`;
+      document.getElementById('wastage-total').textContent = `£${total.toFixed(2)}`;
+      renderDashRecent('dash-wastage-recent', docs.slice(0,4), d => `
+        <div class="recent-item">
+          <div><div class="recent-name">${d.product}</div><div class="recent-meta">${d.code} · ${d.date}</div></div>
+          <span class="pill pending">£${(d.cost||0).toFixed(2)}</span>
+        </div>`);
+    });
+  }
+
+  // ── Render functions ─────────────────────────────────────────────────────
+
+  function renderDashRecent(id, items, fn) {
+    const el = document.getElementById(id);
+    el.innerHTML = items.length ? items.map(fn).join('') : '<div class="empty-state">No records yet.</div>';
+  }
+
+  function renderCustomers(docs) {
+    const tb = document.getElementById('customers-tbody');
+    if (!docs.length) {
+      tb.innerHTML = '<tr><td colspan="8" class="table-empty">No customers logged yet.</td></tr>'; return;
+    }
+    tb.innerHTML = docs.map(d => `
+      <tr>
+        <td><strong>${d.name}</strong>${d.companyNo ? `<div class="text-muted mt-4">Co. No: ${d.companyNo}</div>` : ''}</td>
+        <td>${d.contact || '—'}<div class="text-muted mt-4">${d.email || ''}</div></td>
+        <td class="muted">${d.address || '—'}</td>
+        <td>${d.licence || '—'}<div class="text-muted mt-4">${d.authority || ''}</div></td>
+        <td>${d.chVerified || '—'}</td>
+        <td><span class="pill ${d.status}">${d.status}</span></td>
+        <td class="muted">${d.dateAdded || '—'}</td>
+        <td><button class="btn-secondary" style="font-size:11px;padding:5px 10px" onclick="deleteRecord('customers','${d.id}')">Delete</button></td>
+      </tr>`).join('');
+  }
+
+  function renderSuppliers(docs) {
+    const tb = document.getElementById('suppliers-tbody');
+    if (!docs.length) {
+      tb.innerHTML = '<tr><td colspan="8" class="table-empty">No suppliers logged yet.</td></tr>'; return;
+    }
+    tb.innerHTML = docs.map(d => `
+      <tr>
+        <td><strong>${d.name}</strong>${d.regName ? `<div class="text-muted mt-4">${d.regName}</div>` : ''}</td>
+        <td>${d.contact || '—'}<div class="text-muted mt-4">${d.email || ''}</div></td>
+        <td><span class="awrs-badge">🔑 ${d.awrs || '—'}</span></td>
+        <td><span class="pill ${d.awrsStatus === 'Approved' ? 'approved' : 'pending'}">${d.awrsStatus || '—'}</span></td>
+        <td><span class="pill dp">${d.duty || '—'}</span></td>
+        <td class="muted">${d.awrsDate || '—'}</td>
+        <td><span class="pill ${d.status}">${d.status}</span></td>
+        <td><button class="btn-secondary" style="font-size:11px;padding:5px 10px" onclick="deleteRecord('suppliers','${d.id}')">Delete</button></td>
+      </tr>`).join('');
+  }
+
+  let _runningTotal = 0;
+  function renderStock(docs) {
+    const tb = document.getElementById('stock-tbody');
+    if (!docs.length) {
+      tb.innerHTML = '<tr><td colspan="9" class="table-empty">No movements logged yet.</td></tr>'; return;
+    }
+    let running = 0;
+    const sorted = [...docs].sort((a,b) => new Date(a.date) - new Date(b.date));
+    const withTotals = sorted.map(d => {
+      running += d.type === 'IN' ? (d.qty||0) : -(d.qty||0);
+      return { ...d, runningTotal: running };
+    }).reverse();
+    tb.innerHTML = withTotals.map(d => `
+      <tr>
+        <td class="muted">${d.ref || '—'}</td>
+        <td class="muted">${d.date}</td>
+        <td><span class="pill ${d.type === 'IN' ? 'in' : 'out'}">${d.type}</span></td>
+        <td>${d.party || '—'}</td>
+        <td><strong>${d.product}</strong>${d.vintage ? `<div class="text-muted mt-4">${d.vintage}</div>` : ''}</td>
+        <td class="muted">${d.vintage || '—'}</td>
+        <td><strong>${d.qty}</strong></td>
+        <td><strong>${d.runningTotal}</strong> bottles</td>
+        <td class="muted">${d.loggedBy || '—'}</td>
+      </tr>`).join('');
+    document.getElementById('running-total-display').textContent = `${running} bottles`;
+  }
+
+  function renderInventory(docs) {
+    const tb = document.getElementById('inventory-tbody');
+    if (!docs.length) {
+      tb.innerHTML = '<tr><td colspan="9" class="table-empty">No stock lines logged yet.</td></tr>'; return;
+    }
+    tb.innerHTML = docs.map(d => `
+      <tr>
+        <td><strong>${d.product}</strong></td>
+        <td>${d.producer || '—'}</td>
+        <td class="muted">${d.vintage || '—'}</td>
+        <td><span class="pill dp">${d.type || '—'}</span></td>
+        <td><strong>${d.bottles || 0}</strong></td>
+        <td class="muted">£${(d.cost||0).toFixed(2)}</td>
+        <td><strong>£${((d.bottles||0)*(d.cost||0)).toFixed(2)}</strong></td>
+        <td class="muted">${d.lastUpdated || '—'}</td>
+        <td><button class="btn-secondary" style="font-size:11px;padding:5px 10px" onclick="deleteRecord('inventory','${d.id}')">Delete</button></td>
+      </tr>`).join('');
+  }
+
+  function renderWastage(docs) {
+    const tb = document.getElementById('wastage-tbody');
+    if (!docs.length) {
+      tb.innerHTML = '<tr><td colspan="9" class="table-empty">No incidents logged yet.</td></tr>'; return;
+    }
+    tb.innerHTML = docs.map((d, i) => `
+      <tr>
+        <td class="muted">WB-${String(docs.length - i).padStart(3,'0')}</td>
+        <td class="muted">${d.date}</td>
+        <td><strong>${d.product}</strong></td>
+        <td>${d.producer || '—'}</td>
+        <td>${d.qty || '—'}</td>
+        <td><span class="pill pending">${d.code}</span></td>
+        <td style="color:var(--red);font-weight:600">£${(d.cost||0).toFixed(2)}</td>
+        <td style="font-size:12px;max-width:200px">${d.action || '—'}</td>
+        <td class="muted">${d.loggedBy || '—'}</td>
+      </tr>`).join('');
+  }
+
+  // ── Save functions ────────────────────────────────────────────────────────
+
+  window.saveCustomer = async () => {
+    const name = document.getElementById('c-name').value.trim();
+    if (!name) { showToast('Please enter a business name.'); return; }
+    const data = {
+      name, companyNo: v('c-company-no'), address: v('c-address'),
+      contact: v('c-contact'), email: v('c-email'), phone: v('c-phone'),
+      vat: v('c-vat'), licence: v('c-licence'), authority: v('c-authority'),
+      status: v('c-status'), chVerified: v('c-ch-verified'), notes: v('c-notes'),
+      dateAdded: new Date().toLocaleDateString('en-GB'),
+      loggedBy: window._currentUserEmail,
+      createdAt: window._isDemo ? new Date() : window._Timestamp.now()
+    };
+    await saveToDb('customers', data); closeModal('customer'); clearForm('customer');
+  };
+
+  window.saveSupplier = async () => {
+    const name = document.getElementById('s-name').value.trim();
+    if (!name) { showToast('Please enter a business name.'); return; }
+    const awrs = document.getElementById('s-awrs').value.trim();
+    if (!awrs) { showToast('AWRS URN is required for all suppliers.'); return; }
+    const data = {
+      name, regName: v('s-reg-name'), companyNo: v('s-company-no'),
+      vat: v('s-vat'), awrs, awrsStatus: v('s-awrs-status'),
+      awrsDate: v('s-awrs-date'), contact: v('s-contact'),
+      email: v('s-email'), phone: v('s-phone'), address: v('s-address'),
+      visited: v('s-visited'), duty: v('s-duty'), status: v('s-status'),
+      notes: v('s-notes'),
+      dateAdded: new Date().toLocaleDateString('en-GB'),
+      loggedBy: window._currentUserEmail,
+      createdAt: window._isDemo ? new Date() : window._Timestamp.now()
+    };
+    await saveToDb('suppliers', data); closeModal('supplier'); clearForm('supplier');
+  };
+
+  let _stockCount = 0;
+  window.saveStock = async () => {
+    const product = document.getElementById('sm-product').value.trim();
+    const qty = parseInt(document.getElementById('sm-qty').value);
+    if (!product || !qty) { showToast('Product and quantity are required.'); return; }
+    _stockCount++;
+    const type = v('sm-type');
+    const data = {
+      ref: `${type}-${String(_stockCount).padStart(3,'0')}`,
+      date: v('sm-date') || new Date().toLocaleDateString('en-GB'),
+      type, party: v('sm-party'), product, vintage: v('sm-vintage'),
+      qty, notes: v('sm-notes'),
+      loggedBy: window._currentUserEmail,
+      createdAt: window._isDemo ? new Date() : window._Timestamp.now()
+    };
+    await saveToDb('stock', data); closeModal('stock'); clearForm('stock');
+  };
+
+  window.saveInventory = async () => {
+    const product = document.getElementById('inv-product').value.trim();
+    if (!product) { showToast('Product name is required.'); return; }
+    const data = {
+      product, producer: v('inv-producer'), vintage: v('inv-vintage'),
+      type: v('inv-type'),
+      bottles: parseInt(document.getElementById('inv-bottles').value) || 0,
+      cost: parseFloat(document.getElementById('inv-cost').value) || 0,
+      lastUpdated: new Date().toLocaleDateString('en-GB'),
+      createdAt: window._isDemo ? new Date() : window._Timestamp.now()
+    };
+    await saveToDb('inventory', data); closeModal('inventory'); clearForm('inventory');
+  };
+
+  let _wastageCount = 0;
+  window.saveWastage = async () => {
+    const product = document.getElementById('w-product').value.trim();
+    if (!product) { showToast('Product is required.'); return; }
+    _wastageCount++;
+    const data = {
+      date: v('w-date') || new Date().toLocaleDateString('en-GB'),
+      code: v('w-code'), product, producer: v('w-producer'),
+      vintage: v('w-vintage'),
+      qty: parseInt(document.getElementById('w-qty').value) || 0,
+      cost: parseFloat(document.getElementById('w-cost').value) || 0,
+      action: v('w-action'),
+      loggedBy: window._currentUserEmail,
+      createdAt: window._isDemo ? new Date() : window._Timestamp.now()
+    };
+    await saveToDb('wastage', data); closeModal('wastage'); clearForm('wastage');
+  };
+
+  // ── DB helpers ─────────────────────────────────────────────────────────
+  const _demoStore = { customers:[], suppliers:[], stock:[], inventory:[], wastage:[] };
+
+  async function saveToDb(col, data) {
+    if (window._isDemo) {
+      _demoStore[col].unshift({ id: Date.now().toString(), ...data });
+      refreshDemo(col);
+      showToast('Saved (demo mode — data is not persisted)');
+    } else {
+      await window._addDoc(window._collection(window._db, col), data);
+      showToast('Saved successfully ✓');
+    }
+  }
+
+  window.deleteRecord = async (col, id) => {
+    if (!confirm('Delete this record? This cannot be undone.')) return;
+    if (window._isDemo) {
+      _demoStore[col] = _demoStore[col].filter(d => d.id !== id);
+      refreshDemo(col); showToast('Deleted');
+    } else {
+      await window._deleteDoc(window._doc(window._db, col, id));
+      showToast('Record deleted');
+    }
+  };
+
+  function refreshDemo(col) {
+    const docs = _demoStore[col];
+    if (col === 'customers') { renderCustomers(docs); document.getElementById('stat-customers').textContent = docs.filter(d=>d.status==='approved').length; }
+    if (col === 'suppliers') { renderSuppliers(docs); document.getElementById('stat-suppliers').textContent = docs.filter(d=>d.status==='approved').length; }
+    if (col === 'stock')     { renderStock(docs); }
+    if (col === 'inventory') { renderInventory(docs); const t = docs.reduce((a,d)=>a+(d.bottles||0)*(d.cost||0),0); document.getElementById('inventory-total').textContent = `£${t.toFixed(2)}`; document.getElementById('stat-stock-value').textContent=`£${t.toFixed(0)}`; }
+    if (col === 'wastage')   { renderWastage(docs); const t = docs.reduce((a,d)=>a+(d.cost||0),0); document.getElementById('wastage-total').textContent=`£${t.toFixed(2)}`; document.getElementById('stat-wastage').textContent=`£${t.toFixed(0)}`; }
+  }
+
+  // ── Load demo data ─────────────────────────────────────────────────────
+  function loadDemoData() {
+    _demoStore.suppliers = [
+      { id:'s1', name:'Albourne Winery Ltd', awrs:'XJAW00000102670', awrsStatus:'Approved', awrsDate:'2025-01-10', contact:'Giles Cutlack, Trade Manager', duty:'Yes', status:'approved', visited:'Yes', createdAt: new Date() },
+      { id:'s2', name:'Balfour Winery LLP', regName:'Hush Heath Estate', awrs:'XNAW00000103921', awrsStatus:'Approved', awrsDate:'2025-01-10', contact:'Amber Eggleton, Head of National Accounts', duty:'Yes', status:'approved', visited:'Yes', createdAt: new Date() },
+      { id:'s3', name:'Oxney Organic Estate', regName:'Little Bellhurst Farm', awrs:'XGAW00000101406', awrsStatus:'Approved', awrsDate:'2025-01-10', contact:'Kristin Syltevik, Owner', duty:'Yes', status:'approved', visited:'Yes', createdAt: new Date() },
+      { id:'s4', name:'Westwell Wines', regName:'Westwell Wine Estates Ltd', awrs:'XJAW00000109492', awrsStatus:'Approved', awrsDate:'2025-01-10', contact:'Orson Warr, Sales Director', duty:'Yes', status:'approved', visited:'Yes', createdAt: new Date() },
+    ];
+    _demoStore.customers = [
+      { id:'c1', name:'GemNi Restaurant', address:'Back Lane, Rawtenstall, BB4 7QZ', licence:'Pending verification', status:'pending', chVerified:'Yes', createdAt: new Date() },
+      { id:'c2', name:'Ye Olde Boot & Shoe', address:'58-62 Millar Barn Lane, Waterfoot, BB4 7AU', licence:'Pending verification', status:'pending', chVerified:'Yes', createdAt: new Date() },
+      { id:'c3', name:"Anna's Café-Bar", address:'165 Burnley Road, Weir, Bacup, OL13 8QE', licence:'Pending verification', status:'pending', chVerified:'Yes', createdAt: new Date() },
+    ];
+    ['customers','suppliers'].forEach(col => refreshDemo(col));
+    document.getElementById('stat-customers').textContent = 3;
+    document.getElementById('stat-suppliers').textContent = 4;
+  }
+
+  // ── Documents page ─────────────────────────────────────────────────────
+  function buildDocuments() {
+    const docs = [
+      { name:'New Customer DD Form', type:'Word Document', icon:'📋', note:'Complete for every new customer before first order' },
+      { name:'New Supplier DD Form', type:'Word Document', icon:'🍇', note:'Complete for every new supplier — AWRS verification required' },
+      { name:'Stock Movement Register', type:'Word Document', icon:'📊', note:'Monthly register — print at start of each month' },
+      { name:'Warehouse Inventory', type:'Word Document', icon:'📦', note:'Complete at each stock count' },
+      { name:'Wastage & Breakage Register', type:'Word Document', icon:'⚠️', note:'Log every incident immediately' },
+      { name:'Business Plan', type:'PDF', icon:'📈', note:'Great British Terroir Ltd — HMRC submission copy' },
+      { name:'Due Diligence Policy', type:'PDF', icon:'🛡️', note:'Great British Terroir Ltd — HMRC submission copy' },
+      { name:'AWRS Lookup', type:'External Link', icon:'🔗', note:'Verify supplier AWRS status in real time' },
+    ];
+    const links = [
+      '','','','','','','',
+      'https://www.gov.uk/check-alcohol-wholesaler-registration'
+    ];
+    document.getElementById('doc-grid').innerHTML = docs.map((d,i) => `
+      <div class="doc-card" onclick="${links[i] ? `window.open('${links[i]}','_blank')` : 'showToast(\"Upload this document to Google Drive and paste the link here in the HTML to enable download.\")'}" title="${d.name}">
+        <div class="doc-icon">${d.icon}</div>
+        <div>
+          <div class="doc-name">${d.name}</div>
+          <div class="doc-type">${d.type}</div>
+        </div>
+        <div class="doc-note">${d.note}</div>
+      </div>`).join('');
+  }
+
+  // ── Utilities ────────────────────────────────────────────────────────────
+  function v(id) { return document.getElementById(id)?.value || ''; }
+
+  window.openModal = (type) => { document.getElementById(`modal-${type}`).classList.remove('hidden'); };
+  window.closeModal = (type) => { document.getElementById(`modal-${type}`).classList.add('hidden'); };
+
+  window.clearForm = (type) => {
+    const map = {
+      customer: ['c-name','c-company-no','c-address','c-contact','c-email','c-phone','c-vat','c-licence','c-authority','c-notes'],
+      supplier: ['s-name','s-reg-name','s-company-no','s-vat','s-awrs','s-contact','s-email','s-phone','s-address','s-notes'],
+      stock: ['sm-party','sm-product','sm-vintage','sm-notes'],
+      inventory: ['inv-product','inv-producer','inv-vintage'],
+      wastage: ['w-product','w-producer','w-vintage','w-action'],
+    };
+    (map[type]||[]).forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+    ['sm-qty','inv-bottles','inv-cost','w-qty','w-cost'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  };
+
+  window.navigate = (page) => {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(`page-${page}`).classList.add('active');
+    const titles = { dashboard:'Dashboard', customers:'Customer Register', suppliers:'Supplier Register', stock:'Stock Movements', inventory:'Warehouse Inventory', wastage:'Wastage & Breakage', documents:'Document Library' };
+    document.getElementById('page-title').textContent = titles[page] || page;
+    event.currentTarget.classList.add('active');
+  };
+
+  window.filterTable = (tableId, query) => {
+    const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+    const q = query.toLowerCase();
+    rows.forEach(row => {
+      row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  };
+
+  window.showToast = (msg) => {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  };
+
+  // Close modals on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.add('hidden'); });
+  });
+</script>
+</body>
+</html>
